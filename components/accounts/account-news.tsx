@@ -1,16 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScoreBar } from "@/components/ui/score-bar";
-import { MOCK_NEWS } from "@/lib/data/mock-news";
+import { fetchNewsByAccountId } from "@/lib/supabase/queries";
 import { NEWS_EVENT_LABELS } from "@/lib/constants/labels";
 import { Newspaper, ExternalLink } from "lucide-react";
 
-export function AccountNews({ accountId }: { accountId: string }) {
-  const news = MOCK_NEWS.filter(
-    (item) =>
-      item.account_id === accountId ||
-      item.linked_accounts.some((link) => link.account_id === accountId)
-  );
+export async function AccountNews({ accountId }: { accountId: string }) {
+  const news = await fetchNewsByAccountId(accountId);
 
   if (news.length === 0) {
     return (

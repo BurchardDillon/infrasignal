@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
 import { ScoreBar } from "@/components/ui/score-bar";
-import { MOCK_PROSPECTS } from "@/lib/data/mock-prospects";
+import { fetchProspects } from "@/lib/supabase/queries";
 import {
   COMPANY_TYPE_LABELS,
   HARDWARE_CATEGORY_LABELS,
@@ -38,14 +38,12 @@ const columns = [
   { key: "status", label: "Status" },
 ];
 
-const sortedProspects = [...MOCK_PROSPECTS].sort(
-  (a, b) => b.priority_score - a.priority_score,
-);
+export async function ProspectingQueue() {
+  const prospects = await fetchProspects();
 
-export function ProspectingQueue() {
   return (
     <DataTable columns={columns}>
-      {sortedProspects.map((prospect) => (
+      {prospects.map((prospect) => (
         <tr key={prospect.id}>
           <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
             {prospect.company_name}

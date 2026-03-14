@@ -3,7 +3,7 @@ import { AccountProfile } from "@/components/accounts/account-profile";
 import { AccountEvidence } from "@/components/accounts/account-evidence";
 import { AccountContacts } from "@/components/accounts/account-contacts";
 import { AccountNews } from "@/components/accounts/account-news";
-import { MOCK_ACCOUNTS } from "@/lib/data/mock-accounts";
+import { fetchAccountById } from "@/lib/supabase/queries";
 import { notFound } from "next/navigation";
 
 export default async function AccountDetailPage({
@@ -12,7 +12,7 @@ export default async function AccountDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const account = MOCK_ACCOUNTS.find((a) => a.id === id);
+  const account = await fetchAccountById(id);
 
   if (!account) {
     notFound();

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
-import { MOCK_ACCOUNTS } from "@/lib/data/mock-accounts";
+import { fetchAccounts } from "@/lib/supabase/queries";
 import {
   COMPANY_TYPE_LABELS,
   ACCOUNT_STATUS_LABELS,
@@ -41,10 +41,12 @@ const columns = [
   { key: "last_reviewed", label: "Last Reviewed", className: "text-right" },
 ];
 
-export function AccountsTable() {
+export async function AccountsTable() {
+  const accounts = await fetchAccounts();
+
   return (
     <DataTable columns={columns}>
-      {MOCK_ACCOUNTS.map((account) => (
+      {accounts.map((account) => (
         <tr
           key={account.id}
           className="group hover:bg-gray-50 dark:hover:bg-gray-900"

@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScoreBar } from "@/components/ui/score-bar";
-import { MOCK_EVIDENCE } from "@/lib/data/mock-evidence";
+import { fetchEvidenceByAccountId } from "@/lib/supabase/queries";
 import {
   SIGNAL_DIRECTION_LABELS,
   EVIDENCE_SOURCE_LABELS,
@@ -18,8 +18,8 @@ const DIRECTION_VARIANT: Record<
   neutral: "neutral",
 };
 
-export function AccountEvidence({ accountId }: { accountId: string }) {
-  const evidence = MOCK_EVIDENCE.filter((e) => e.account_id === accountId);
+export async function AccountEvidence({ accountId }: { accountId: string }) {
+  const evidence = await fetchEvidenceByAccountId(accountId);
 
   if (evidence.length === 0) {
     return (

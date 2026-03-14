@@ -2,8 +2,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScoreBar } from "@/components/ui/score-bar";
-import { MOCK_NEWS } from "@/lib/data/mock-news";
-import { MOCK_ACCOUNTS } from "@/lib/data/mock-accounts";
+import { fetchNewsItems, fetchAccountNameMap } from "@/lib/supabase/queries";
 import {
   NEWS_EVENT_LABELS,
   HARDWARE_CATEGORY_LABELS,
@@ -32,11 +31,6 @@ const EVENT_TYPE_VARIANT: Record<
   other: "neutral",
 };
 
-function getAccountName(accountId: string): string {
-  const account = MOCK_ACCOUNTS.find((a) => a.id === accountId);
-  return account?.company_name ?? "Unknown";
-}
-
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-US", {
     year: "numeric",
@@ -45,10 +39,15 @@ function formatDate(date: Date): string {
   });
 }
 
-export function NewsFeed() {
+export async function NewsFeed() {
+  const [newsItems, accountNames] = await Promise.all([
+    fetchNewsItems(),
+    fetchAccountNameMap(),
+  ]);
+
   return (
     <div className="flex flex-col gap-6">
-      {MOCK_NEWS.map((item) => {
+      {newsItems.map((item) => {
         const allAccountIds = new Set<string>();
         if (item.account_id) {
           allAccountIds.add(item.account_id);
@@ -137,7 +136,7 @@ export function NewsFeed() {
                     href={`/accounts/${accountId}`}
                     className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                   >
-                    {getAccountName(accountId)}
+                    {accountNames.get(accountId) ?? "Unknown"}
                   </Link>
                 ))}
               </div>

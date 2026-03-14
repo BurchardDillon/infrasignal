@@ -2,12 +2,12 @@ import Link from "next/link";
 import { Lightbulb, Newspaper } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MOCK_EVIDENCE } from "@/lib/data/mock-evidence";
-import { MOCK_NEWS } from "@/lib/data/mock-news";
+import { fetchRecentIntelligence } from "@/lib/supabase/queries";
 import {
   EVIDENCE_SOURCE_LABELS,
   NEWS_EVENT_LABELS,
 } from "@/lib/constants/labels";
+import type { Evidence, NewsItem } from "@/lib/types";
 
 type FeedItem =
   | {
@@ -27,28 +27,31 @@ type FeedItem =
       accountId: string | null;
     };
 
-function buildFeed(): FeedItem[] {
-  const evidenceItems: FeedItem[] = MOCK_EVIDENCE.map((e) => ({
-    kind: "evidence" as const,
-    id: e.id,
-    title: e.headline,
-    badgeLabel: EVIDENCE_SOURCE_LABELS[e.source_type],
-    date: e.created_at,
-    accountId: e.account_id,
-  }));
+function isEvidence(item: Evidence | NewsItem): item is Evidence {
+  return "headline" in item;
+}
 
-  const newsItems: FeedItem[] = MOCK_NEWS.map((n) => ({
-    kind: "news" as const,
-    id: n.id,
-    title: n.title,
-    badgeLabel: NEWS_EVENT_LABELS[n.event_type],
-    date: n.created_at,
-    accountId: n.account_id,
-  }));
-
-  return [...evidenceItems, ...newsItems]
-    .sort((a, b) => b.date.getTime() - a.date.getTime())
-    .slice(0, 5);
+function buildFeed(items: Array<Evidence | NewsItem>): FeedItem[] {
+  return items.map((item) => {
+    if (isEvidence(item)) {
+      return {
+        kind: "evidence" as const,
+        id: item.id,
+        title: item.headline,
+        badgeLabel: EVIDENCE_SOURCE_LABELS[item.source_type],
+        date: item.created_at,
+        accountId: item.account_id,
+      };
+    }
+    return {
+      kind: "news" as const,
+      id: item.id,
+      title: item.title,
+      badgeLabel: NEWS_EVENT_LABELS[item.event_type],
+      date: item.created_at,
+      accountId: item.account_id,
+    };
+  });
 }
 
 function formatDate(date: Date): string {
@@ -59,8 +62,9 @@ function formatDate(date: Date): string {
   });
 }
 
-export function IntelligenceFeed() {
-  const feedItems = buildFeed();
+export async function IntelligenceFeed() {
+  const recentItems = await fetchRecentIntelligence(5);
+  const feedItems = buildFeed(recentItems);
 
   return (
     <Card>

@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { DataTable } from "@/components/ui/data-table";
-import { MOCK_CONTACTS } from "@/lib/data/mock-contacts";
-import { MOCK_ACCOUNTS } from "@/lib/data/mock-accounts";
+import { fetchContacts, fetchAccountNameMap } from "@/lib/supabase/queries";
 import {
   DEPARTMENT_LABELS,
   SENIORITY_LABELS,
@@ -43,15 +42,15 @@ const columns = [
   { key: "outreach", label: "Outreach Status" },
 ];
 
-function getAccountName(accountId: string): string {
-  const account = MOCK_ACCOUNTS.find((a) => a.id === accountId);
-  return account?.company_name ?? "Unknown";
-}
+export async function ContactsTable() {
+  const [contacts, accountNames] = await Promise.all([
+    fetchContacts(),
+    fetchAccountNameMap(),
+  ]);
 
-export function ContactsTable() {
   return (
     <DataTable columns={columns}>
-      {MOCK_CONTACTS.map((contact) => (
+      {contacts.map((contact) => (
         <tr key={contact.id}>
           <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">
             {contact.full_name}
@@ -64,7 +63,7 @@ export function ContactsTable() {
               href={`/accounts/${contact.account_id}`}
               className="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
             >
-              {getAccountName(contact.account_id)}
+              {accountNames.get(contact.account_id) ?? "Unknown"}
             </Link>
           </td>
           <td className="px-4 py-3">

@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MOCK_CONTACTS } from "@/lib/data/mock-contacts";
+import { fetchContactsByAccountId } from "@/lib/supabase/queries";
 import {
   DEPARTMENT_LABELS,
   SENIORITY_LABELS,
@@ -27,8 +27,8 @@ const CONFIDENCE_COLOR: Record<EmailConfidence, string> = {
   unknown: "text-gray-400 dark:text-gray-500",
 };
 
-export function AccountContacts({ accountId }: { accountId: string }) {
-  const contacts = MOCK_CONTACTS.filter((c) => c.account_id === accountId);
+export async function AccountContacts({ accountId }: { accountId: string }) {
+  const contacts = await fetchContactsByAccountId(accountId);
 
   if (contacts.length === 0) {
     return (

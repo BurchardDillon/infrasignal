@@ -248,6 +248,54 @@ export async function fetchRecentIntelligence(
 }
 
 // ---------------------------------------------------------------------------
+// Mutations
+// ---------------------------------------------------------------------------
+
+type NewsInsertRow = Database["public"]["Tables"]["news_items"]["Insert"];
+
+/** Insert a fully-prepared news item into the news_items table. */
+export async function insertNewsItem(
+  item: NewsInsertRow
+): Promise<NewsItem> {
+  const { data, error } = await supabase
+    .from("news_items")
+    .insert(item as never)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return mapNewsItem(data as unknown as NewsRow);
+}
+
+/** Update a prospect's priority_score. */
+export async function updateProspectScore(
+  id: string,
+  priority_score: number
+): Promise<void> {
+  const { error } = await supabase
+    .from("prospects")
+    .update({ priority_score } as never)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+/** Fetch accounts (id, company_name, domain) for auto-linking news items. */
+export async function fetchAccountsForLinking(): Promise<
+  Array<{ id: string; company_name: string; domain: string | null }>
+> {
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("*")
+    .order("company_name");
+  if (error) throw error;
+  const rows = (data ?? []) as AccountRow[];
+  return rows.map((r) => ({
+    id: r.id,
+    company_name: r.company_name,
+    domain: r.domain,
+  }));
+}
+
+// ---------------------------------------------------------------------------
 // Account name lookup (for contacts table, news feed)
 // ---------------------------------------------------------------------------
 

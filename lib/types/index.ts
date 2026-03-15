@@ -5,3 +5,4 @@ export type { Contact } from "./contacts";
 export type { Evidence } from "./evidence";
 export type { NewsItem } from "./news";
 export type { Prospect } from "./prospects";
+export type { RawArticleInput, InterpretedNews } from "./ingestion";

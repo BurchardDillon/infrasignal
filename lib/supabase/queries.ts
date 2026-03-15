@@ -1,5 +1,5 @@
 import { supabase } from "./client";
-import type { Database } from "./database.types";
+import type { Database, Json } from "./database.types";
 import type {
   Account,
   Contact,
@@ -293,6 +293,48 @@ export async function fetchAccountsForLinking(): Promise<
     company_name: r.company_name,
     domain: r.domain,
   }));
+}
+
+/** Update an account's qualification fields. */
+export async function updateAccountQualification(
+  id: string,
+  fields: {
+    direct_buy_likelihood: string;
+    infra_ownership_verdict: string;
+    evidence_strength: string;
+    why_it_matters: string | null;
+    negative_signals: string | null;
+    component_fit: ComponentFit[];
+  }
+): Promise<void> {
+  const { error } = await supabase
+    .from("accounts")
+    .update({
+      direct_buy_likelihood: fields.direct_buy_likelihood,
+      infra_ownership_verdict: fields.infra_ownership_verdict,
+      evidence_strength: fields.evidence_strength,
+      why_it_matters: fields.why_it_matters,
+      negative_signals: fields.negative_signals,
+      component_fit: fields.component_fit as unknown as Json,
+    } as never)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+/** Update a prospect's qualification fields. */
+export async function updateProspectQualification(
+  id: string,
+  fields: {
+    proposed_direct_buy_likelihood: string;
+    proposed_infra_ownership_verdict: string;
+    priority_score: number;
+  }
+): Promise<void> {
+  const { error } = await supabase
+    .from("prospects")
+    .update(fields as never)
+    .eq("id", id);
+  if (error) throw error;
 }
 
 // ---------------------------------------------------------------------------

@@ -7,6 +7,12 @@ import {
   Wrench,
   RefreshCw,
   ShieldCheck,
+  Bot,
+  Rss,
+  Search,
+  Crosshair,
+  Cpu,
+  Radar,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -22,10 +28,16 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Contacts", href: "/contacts", icon: Users },
   { label: "News Intelligence", href: "/intelligence", icon: Newspaper },
   { label: "Prospecting Queue", href: "/prospecting", icon: ListFilter },
+  { label: "PN Match", href: "/pn-match", icon: Crosshair },
 ];
 
 export const ADMIN_NAV_ITEMS: NavItem[] = [
   { label: "News Ingestion", href: "/admin/ingest", icon: Wrench },
+  { label: "Feed Sources", href: "/admin/feeds", icon: Rss },
   { label: "Refresh Scores", href: "/admin/scores", icon: RefreshCw },
   { label: "Qualification", href: "/admin/qualify", icon: ShieldCheck },
+  { label: "Company Discovery", href: "/admin/discovery", icon: Search },
+  { label: "Account Discovery", href: "/admin/account-discovery", icon: Radar },
+  { label: "Components", href: "/admin/components", icon: Cpu },
+  { label: "Agent Runs", href: "/admin/agents", icon: Bot },
 ];

@@ -3,7 +3,11 @@ import type { Database, Json } from "./database.types";
 import type {
   Account,
   Contact,
+  DiscoverySource,
+  DiscoverySourceType,
   Evidence,
+  FeedSource,
+  JobRun,
   NewsItem,
   Prospect,
 } from "@/lib/types";
@@ -17,6 +21,10 @@ type ContactRow = Database["public"]["Tables"]["contacts"]["Row"];
 type EvidenceRow = Database["public"]["Tables"]["evidence"]["Row"];
 type NewsRow = Database["public"]["Tables"]["news_items"]["Row"];
 type ProspectRow = Database["public"]["Tables"]["prospects"]["Row"];
+type JobRunRow = Database["public"]["Tables"]["job_runs"]["Row"];
+type FeedSourceRow = Database["public"]["Tables"]["feed_sources"]["Row"];
+type DiscoverySourceRow = Database["public"]["Tables"]["discovery_sources"]["Row"];
+type ProspectInsertRow = Database["public"]["Tables"]["prospects"]["Insert"];
 
 // ---------------------------------------------------------------------------
 // Row → Domain mappers
@@ -78,6 +86,17 @@ function mapProspect(row: ProspectRow): Prospect {
     created_at: new Date(row.created_at),
     updated_at: new Date(row.updated_at),
   } as Prospect;
+}
+
+function mapFeedSource(row: FeedSourceRow): FeedSource {
+  return {
+    ...row,
+    last_fetched_at: row.last_fetched_at
+      ? new Date(row.last_fetched_at)
+      : null,
+    created_at: new Date(row.created_at),
+    updated_at: new Date(row.updated_at),
+  } as FeedSource;
 }
 
 // ---------------------------------------------------------------------------
@@ -353,4 +372,329 @@ export async function fetchAccountNameMap(): Promise<Map<string, string>> {
     map.set(row.id, row.company_name);
   }
   return map;
+}
+
+// ---------------------------------------------------------------------------
+// Job Run queries
+// ---------------------------------------------------------------------------
+
+function mapJobRun(row: JobRunRow): JobRun {
+  return {
+    ...row,
+    summary: row.summary as Record<string, unknown>,
+    started_at: new Date(row.started_at),
+    completed_at: row.completed_at ? new Date(row.completed_at) : null,
+    created_at: new Date(row.created_at),
+    updated_at: new Date(row.updated_at),
+  } as JobRun;
+}
+
+/** Create a new job_run record with status 'running'. Returns the row id. */
+export async function insertJobRun(agentName: string): Promise<string> {
+  const { data, error } = await supabase
+    .from("job_runs")
+    .insert({ agent_name: agentName } as never)
+    .select("id")
+    .single();
+  if (error) throw error;
+  return (data as unknown as { id: string }).id;
+}
+
+/** Mark a job_run as completed with summary. */
+export async function completeJobRun(
+  id: string,
+  summary: Record<string, unknown>,
+  durationMs: number
+): Promise<void> {
+  const { error } = await supabase
+    .from("job_runs")
+    .update({
+      status: "completed",
+      completed_at: new Date().toISOString(),
+      duration_ms: durationMs,
+      summary: summary as unknown as Json,
+    } as never)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+/** Mark a job_run as failed with error message. */
+export async function failJobRun(
+  id: string,
+  errorMessage: string,
+  durationMs: number
+): Promise<void> {
+  const { error } = await supabase
+    .from("job_runs")
+    .update({
+      status: "failed",
+      completed_at: new Date().toISOString(),
+      duration_ms: durationMs,
+      error: errorMessage,
+    } as never)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+/** Fetch recent job runs, optionally filtered by agent_name. */
+export async function fetchJobRuns(
+  agentName?: string,
+  limit = 20
+): Promise<JobRun[]> {
+  let query = supabase
+    .from("job_runs")
+    .select("*")
+    .order("started_at", { ascending: false })
+    .limit(limit);
+
+  if (agentName) {
+    query = query.eq("agent_name", agentName);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []).map(mapJobRun);
+}
+
+// ---------------------------------------------------------------------------
+// Deduplication lookups
+// ---------------------------------------------------------------------------
+
+/** Fetch all existing prospect domains (non-null) for deduplication. */
+export async function fetchProspectDomains(): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from("prospects")
+    .select("domain")
+    .not("domain", "is", null);
+  if (error) throw error;
+  const rows = (data ?? []) as unknown as { domain: string }[];
+  return new Set(rows.map((r) => r.domain.toLowerCase()));
+}
+
+/** Fetch all existing account domains (non-null) for deduplication. */
+export async function fetchAccountDomains(): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("domain")
+    .not("domain", "is", null);
+  if (error) throw error;
+  const rows = (data ?? []) as unknown as { domain: string }[];
+  return new Set(rows.map((r) => r.domain.toLowerCase()));
+}
+
+/** Fetch all existing account company names (normalized lowercase). */
+export async function fetchAccountCompanyNames(): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from("accounts")
+    .select("company_name");
+  if (error) throw error;
+  const rows = (data ?? []) as unknown as { company_name: string }[];
+  return new Set(rows.map((r) => r.company_name.toLowerCase().trim()));
+}
+
+/** Fetch all existing news_items source_urls for deduplication. */
+export async function fetchNewsSourceUrls(): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from("news_items")
+    .select("source_url");
+  if (error) throw error;
+  const rows = (data ?? []) as unknown as { source_url: string }[];
+  return new Set(rows.map((r) => r.source_url));
+}
+
+// ---------------------------------------------------------------------------
+// Prospect insert (for Discovery Agent)
+// ---------------------------------------------------------------------------
+
+/** Insert a new prospect. Returns the created prospect. */
+export async function insertProspect(
+  item: ProspectInsertRow
+): Promise<Prospect> {
+  const { data, error } = await supabase
+    .from("prospects")
+    .insert(item as never)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return mapProspect(data as unknown as ProspectRow);
+}
+
+// ---------------------------------------------------------------------------
+// Feed Sources
+// ---------------------------------------------------------------------------
+
+/** Fetch all feed sources, ordered by name. */
+export async function fetchFeedSources(): Promise<FeedSource[]> {
+  const { data, error } = await supabase
+    .from("feed_sources")
+    .select("*")
+    .order("name");
+  if (error) throw error;
+  return (data ?? []).map(mapFeedSource);
+}
+
+/** Fetch only enabled feed sources. */
+export async function fetchEnabledFeedSources(): Promise<FeedSource[]> {
+  const { data, error } = await supabase
+    .from("feed_sources")
+    .select("*")
+    .eq("is_enabled", true)
+    .order("name");
+  if (error) throw error;
+  return (data ?? []).map(mapFeedSource);
+}
+
+/** Insert a new feed source. */
+export async function insertFeedSource(
+  name: string,
+  url: string,
+  sourceType: "rss" | "atom"
+): Promise<FeedSource> {
+  const { data, error } = await supabase
+    .from("feed_sources")
+    .insert({ name, url, source_type: sourceType } as never)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return mapFeedSource(data as unknown as FeedSourceRow);
+}
+
+/** Toggle is_enabled for a feed source. */
+export async function toggleFeedSource(
+  id: string,
+  isEnabled: boolean
+): Promise<void> {
+  const { error } = await supabase
+    .from("feed_sources")
+    .update({ is_enabled: isEnabled } as never)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+/** Delete a feed source. */
+export async function deleteFeedSource(id: string): Promise<void> {
+  const { error } = await supabase
+    .from("feed_sources")
+    .delete()
+    .eq("id", id);
+  if (error) throw error;
+}
+
+/** Update last_fetched_at and optionally last_error for a feed source. */
+export async function updateFeedSourceFetchStatus(
+  id: string,
+  lastError: string | null
+): Promise<void> {
+  const { error } = await supabase
+    .from("feed_sources")
+    .update({
+      last_fetched_at: new Date().toISOString(),
+      last_error: lastError,
+    } as never)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+// ---------------------------------------------------------------------------
+// Discovery Sources
+// ---------------------------------------------------------------------------
+
+function mapDiscoverySource(row: DiscoverySourceRow): DiscoverySource {
+  return {
+    ...row,
+    source_type: row.source_type as DiscoverySourceType,
+    last_run_at: row.last_run_at ? new Date(row.last_run_at) : null,
+    created_at: new Date(row.created_at),
+    updated_at: new Date(row.updated_at),
+  };
+}
+
+/** Fetch all discovery sources, ordered by most recent first. */
+export async function fetchDiscoverySources(): Promise<DiscoverySource[]> {
+  const { data, error } = await supabase
+    .from("discovery_sources")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapDiscoverySource);
+}
+
+/**
+ * Upsert a discovery source by source_key.
+ * When source_key is non-null, uses onConflict to update existing rows.
+ * When source_key is null, always inserts a new row (NULL doesn't conflict).
+ * Returns the source id.
+ */
+export async function upsertDiscoverySource(fields: {
+  name: string;
+  source_type: DiscoverySourceType;
+  source_key: string | null;
+  record_count: number;
+  notes?: string | null;
+}): Promise<string> {
+  const { data, error } = await supabase
+    .from("discovery_sources")
+    .upsert(
+      {
+        name: fields.name,
+        source_type: fields.source_type,
+        source_key: fields.source_key,
+        record_count: fields.record_count,
+        notes: fields.notes ?? null,
+      } as never,
+      { onConflict: "source_key" }
+    )
+    .select("id")
+    .single();
+  if (error) throw error;
+  return (data as unknown as { id: string }).id;
+}
+
+/** Update last_run_at and last_run_job_id after a discovery run completes. */
+export async function updateDiscoverySourceRunStatus(
+  id: string,
+  jobId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from("discovery_sources")
+    .update({
+      last_run_at: new Date().toISOString(),
+      last_run_job_id: jobId,
+    } as never)
+    .eq("id", id);
+  if (error) throw error;
+}
+
+/** Fetch the most recent job_run id for a given agent. */
+export async function fetchLatestJobRunId(
+  agentName: string
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from("job_runs")
+    .select("id")
+    .eq("agent_name", agentName)
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .single();
+  if (error) {
+    if (error.code === "PGRST116") return null;
+    throw error;
+  }
+  return (data as unknown as { id: string }).id;
+}
+
+/** Fetch a single discovery source by source_key. Returns null if not found. */
+export async function fetchDiscoverySourceByKey(
+  sourceKey: string
+): Promise<DiscoverySource | null> {
+  const { data, error } = await supabase
+    .from("discovery_sources")
+    .select("*")
+    .eq("source_key", sourceKey)
+    .single();
+  if (error) {
+    if (error.code === "PGRST116") return null; // not found
+    throw error;
+  }
+  return data ? mapDiscoverySource(data as unknown as DiscoverySourceRow) : null;
 }

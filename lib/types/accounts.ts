@@ -18,6 +18,7 @@ export interface Account {
   industry: string | null;
   employee_count_range: EmployeeCountRange | null;
   hq_location: string | null;
+  country: string;
   company_type: CompanyType;
   status: AccountStatus;
   direct_buy_likelihood: Likelihood;

@@ -16,17 +16,17 @@ BEGIN;
 -- UUID mapping (deterministic IDs so cross-references are stable)
 -- -------------------------------------------------------------------------
 -- Prospects
---   prsp_coreweave  → 00000000-0000-4000-a000-000000000001
---   prsp_hetzner    → 00000000-0000-4000-a000-000000000002
---   prsp_vultr      → 00000000-0000-4000-a000-000000000003
---   prsp_scaleway   → 00000000-0000-4000-a000-000000000004
---   prsp_crusoe     → 00000000-0000-4000-a000-000000000005
+--   prsp_coreweave       → 00000000-0000-4000-a000-000000000001
+--   prsp_penguin          → 00000000-0000-4000-a000-000000000002
+--   prsp_vultr            → 00000000-0000-4000-a000-000000000003
+--   prsp_silicon_mech     → 00000000-0000-4000-a000-000000000004
+--   prsp_crusoe           → 00000000-0000-4000-a000-000000000005
 -- Accounts
---   acc_coreweave   → 00000000-0000-4000-b000-000000000001
---   acc_lambda      → 00000000-0000-4000-b000-000000000002
---   acc_equinix     → 00000000-0000-4000-b000-000000000003
---   acc_hetzner     → 00000000-0000-4000-b000-000000000004
---   acc_ovhcloud    → 00000000-0000-4000-b000-000000000005
+--   acc_coreweave         → 00000000-0000-4000-b000-000000000001
+--   acc_lambda            → 00000000-0000-4000-b000-000000000002
+--   acc_equinix           → 00000000-0000-4000-b000-000000000003
+--   acc_penguin           → 00000000-0000-4000-b000-000000000004
+--   acc_hivelocity        → 00000000-0000-4000-b000-000000000005
 -- Contacts
 --   con_01 → 00000000-0000-4000-c000-000000000001
 --   con_02 → 00000000-0000-4000-c000-000000000002
@@ -52,10 +52,10 @@ BEGIN;
 -- 1. PROSPECTS (without promoted_account_id – set later to avoid FK cycle)
 -- -------------------------------------------------------------------------
 
-INSERT INTO prospects (id, company_name, domain, industry, employee_count_range, hq_location, priority_score, signal_summary, proposed_company_type, proposed_direct_buy_likelihood, proposed_infra_ownership_verdict, hardware_categories, source, status, promoted_account_id, promoted_at, dismissed_at, notes, created_at, updated_at) VALUES
+INSERT INTO prospects (id, company_name, domain, industry, employee_count_range, hq_location, country, priority_score, signal_summary, proposed_company_type, proposed_direct_buy_likelihood, proposed_infra_ownership_verdict, hardware_categories, source, status, promoted_account_id, promoted_at, dismissed_at, notes, created_at, updated_at) VALUES
 (
   '00000000-0000-4000-a000-000000000001',
-  'CoreWeave', 'coreweave.com', 'Cloud Infrastructure / AI', '1001_to_5000', 'Livingston, NJ',
+  'CoreWeave', 'coreweave.com', 'Cloud Infrastructure / AI', '1001_to_5000', 'Livingston, NJ', 'United States',
   95,
   'Multiple strong signals: massive $7.5B debt financing for infrastructure, aggressive hiring for hardware roles, and new data center construction in three US sites. Direct GPU and server buyer at scale.',
   'ai_infrastructure_provider', 'high', 'owned',
@@ -67,19 +67,19 @@ INSERT INTO prospects (id, company_name, domain, industry, employee_count_range,
 ),
 (
   '00000000-0000-4000-a000-000000000002',
-  'Hetzner Online', 'hetzner.com', 'Hosting / Cloud Infrastructure', '501_to_1000', 'Gunzenhausen, Germany',
+  'Penguin Solutions', 'penguinsolutions.com', 'HPC / AI Infrastructure', '201_to_500', 'Fremont, CA', 'United States',
   82,
-  'Vertically integrated hosting company that builds own servers. New data center expansion in Falkenstein signals large component procurement cycle ahead.',
-  'datacenter_operator', 'high', 'owned',
-  ARRAY['server','ssd','hdd','memory','networking'],
+  'HPC and AI cluster builder. Designs and assembles GPU-dense server solutions for government and enterprise. Active NVIDIA DGX/HGX reseller and integrator with DOE contracts.',
+  'system_integrator', 'high', 'hybrid',
+  ARRAY['server','gpu','networking','memory'],
   'manual', 'qualified',
   NULL, '2025-03-01T10:00:00Z', NULL,
-  'Added manually based on industry knowledge of their in-house server manufacturing.',
+  'Added manually based on knowledge of their HPC cluster builds and government contracts.',
   '2025-02-20T14:00:00Z', '2025-03-01T10:00:00Z'
 ),
 (
   '00000000-0000-4000-a000-000000000003',
-  'Vultr (The Constant Company)', 'vultr.com', 'Cloud Infrastructure', '201_to_500', 'Matawan, NJ',
+  'Vultr (The Constant Company)', 'vultr.com', 'Cloud Infrastructure', '201_to_500', 'Matawan, NJ', 'United States',
   76,
   'Growing cloud provider with 32 data center locations. Recently added GPU cloud instances and bare-metal offerings, suggesting increased hardware procurement. Owned infrastructure model confirmed via job postings referencing in-house server deployment.',
   'private_cloud_provider', 'medium', 'hybrid',
@@ -91,19 +91,19 @@ INSERT INTO prospects (id, company_name, domain, industry, employee_count_range,
 ),
 (
   '00000000-0000-4000-a000-000000000004',
-  'Scaleway (Iliad Group)', 'scaleway.com', 'Cloud Infrastructure', '501_to_1000', 'Paris, France',
+  'Silicon Mechanics', 'siliconmechanics.com', 'Custom Server Solutions / HPC', '51_to_200', 'Bothell, WA', 'United States',
   71,
-  'European cloud provider owned by Iliad Group. Operates own data centers in Paris and Amsterdam. Previously designed custom ARM-based servers (ThunderX). Active in GPU cloud with NVIDIA L40S instances.',
-  'private_cloud_provider', 'medium', 'owned',
-  ARRAY['server','gpu','ssd','networking'],
+  'Custom rackmount server and storage solutions provider. Builds to order with component-level procurement. Growing GPU server line for AI workloads.',
+  'system_integrator', 'medium', 'unknown',
+  ARRAY['server','gpu','ssd','memory'],
   'referral', 'new',
   NULL, NULL, NULL,
-  'Referral from OVHcloud contact. Scaleway has history of custom hardware -- worth investigating current procurement model.',
+  'Referral from industry contact. Silicon Mechanics has history of custom server builds -- worth investigating current procurement model.',
   '2025-05-15T10:00:00Z', '2025-05-15T10:00:00Z'
 ),
 (
   '00000000-0000-4000-a000-000000000005',
-  'Crusoe Energy Systems', 'crusoeenergy.com', 'AI Infrastructure / Clean Energy', '201_to_500', 'Denver, CO',
+  'Crusoe Energy Systems', 'crusoeenergy.com', 'AI Infrastructure / Clean Energy', '201_to_500', 'Denver, CO', 'United States',
   88,
   'Clean-energy-powered AI data center company. Building large GPU clusters powered by stranded natural gas and renewable energy. Recent $600M raise specifically for GPU infrastructure buildout.',
   'ai_infrastructure_provider', 'high', 'owned',
@@ -118,13 +118,13 @@ INSERT INTO prospects (id, company_name, domain, industry, employee_count_range,
 -- 2. ACCOUNTS (with source_prospect_id where applicable)
 -- -------------------------------------------------------------------------
 
-INSERT INTO accounts (id, company_name, domain, website, linkedin_company_url, industry, employee_count_range, hq_location, company_type, status, direct_buy_likelihood, infra_ownership_verdict, evidence_strength, why_it_matters, negative_signals, component_fit, hardware_categories, notes, source_prospect_id, last_reviewed_at, created_at, updated_at) VALUES
+INSERT INTO accounts (id, company_name, domain, website, linkedin_company_url, industry, employee_count_range, hq_location, country, company_type, status, direct_buy_likelihood, infra_ownership_verdict, evidence_strength, why_it_matters, negative_signals, component_fit, hardware_categories, notes, source_prospect_id, last_reviewed_at, created_at, updated_at) VALUES
 (
   '00000000-0000-4000-b000-000000000001',
   'CoreWeave', 'coreweave.com', 'https://www.coreweave.com', 'https://www.linkedin.com/company/coreweave',
-  'Cloud Infrastructure / AI', '1001_to_5000', 'Livingston, NJ',
+  'Cloud Infrastructure / AI', '1001_to_5000', 'Livingston, NJ', 'United States',
   'ai_infrastructure_provider', 'active', 'high', 'owned', 'strong',
-  'Rapidly expanding GPU cloud provider with massive NVIDIA hardware procurement. Building out owned data center capacity across the US and Europe.',
+  'Rapidly expanding GPU cloud provider with massive NVIDIA hardware procurement. Building out owned data center capacity across the US.',
   NULL,
   '[{"category":"gpu","fit_reason":"Primary business is GPU-as-a-service; procures NVIDIA H100/B200 at scale"},{"category":"networking","fit_reason":"InfiniBand and high-speed ethernet backbone required for GPU cluster interconnect"},{"category":"server","fit_reason":"Custom server configurations for dense GPU deployments"}]'::jsonb,
   ARRAY['gpu','networking','server','memory'],
@@ -136,7 +136,7 @@ INSERT INTO accounts (id, company_name, domain, website, linkedin_company_url, i
 (
   '00000000-0000-4000-b000-000000000002',
   'Lambda Labs', 'lambdalabs.com', 'https://lambdalabs.com', 'https://www.linkedin.com/company/lambda-labs',
-  'AI Infrastructure / Deep Learning', '201_to_500', 'San Francisco, CA',
+  'AI Infrastructure / Deep Learning', '201_to_500', 'San Francisco, CA', 'United States',
   'ai_infrastructure_provider', 'active', 'high', 'hybrid', 'moderate',
   'Sells GPU workstations and operates a GPU cloud. Both builds own hardware and leases colo space for cloud offering.',
   'Recent shift toward more leased capacity may reduce direct hardware procurement over time.',
@@ -150,7 +150,7 @@ INSERT INTO accounts (id, company_name, domain, website, linkedin_company_url, i
 (
   '00000000-0000-4000-b000-000000000003',
   'Equinix', 'equinix.com', 'https://www.equinix.com', 'https://www.linkedin.com/company/equinix',
-  'Data Center / Colocation', '10001_plus', 'Redwood City, CA',
+  'Data Center / Colocation', '10001_plus', 'Redwood City, CA', 'United States',
   'colo_provider', 'active', 'medium', 'owned', 'strong',
   'World''s largest colocation provider with 260+ data centers globally. Procures networking and server hardware at massive scale for managed services.',
   'Core colo business means tenants bring own hardware; direct buy limited to Equinix Metal and managed services.',
@@ -163,28 +163,28 @@ INSERT INTO accounts (id, company_name, domain, website, linkedin_company_url, i
 ),
 (
   '00000000-0000-4000-b000-000000000004',
-  'Hetzner Online', 'hetzner.com', 'https://www.hetzner.com', 'https://www.linkedin.com/company/hetzner-online',
-  'Hosting / Cloud Infrastructure', '501_to_1000', 'Gunzenhausen, Germany',
-  'datacenter_operator', 'nurturing', 'high', 'owned', 'moderate',
-  'Vertically integrated hosting provider that owns and operates its own data centers and builds custom servers. Known for aggressive hardware procurement at competitive prices.',
+  'Penguin Solutions', 'penguinsolutions.com', 'https://www.penguinsolutions.com', 'https://www.linkedin.com/company/penguin-solutions',
+  'HPC / AI Infrastructure', '201_to_500', 'Fremont, CA', 'United States',
+  'system_integrator', 'nurturing', 'high', 'hybrid', 'moderate',
+  'Leading HPC system integrator that builds custom GPU clusters for US government and enterprise clients. Procures servers, GPUs, and networking at scale.',
   NULL,
-  '[{"category":"server","fit_reason":"Assembles own servers in-house; large volume buyer of motherboards, CPUs, and chassis"},{"category":"ssd","fit_reason":"Heavy NVMe SSD procurement for dedicated server and cloud storage products"},{"category":"hdd","fit_reason":"Storage Box product line requires bulk HDD purchasing"}]'::jsonb,
-  ARRAY['server','ssd','hdd','memory','networking'],
-  'European procurement cycles. Preference for direct manufacturer relationships over distributors.',
+  '[{"category":"server","fit_reason":"Custom HPC cluster builds require large-volume server component procurement"},{"category":"gpu","fit_reason":"NVIDIA DGX/HGX integrator; procures GPUs for government and enterprise clusters"},{"category":"networking","fit_reason":"InfiniBand and high-speed ethernet for HPC cluster interconnect"}]'::jsonb,
+  ARRAY['server','gpu','networking','memory'],
+  'US government contracts require domestic sourcing. Strong relationship with NVIDIA as authorized partner.',
   '00000000-0000-4000-a000-000000000002',
   '2025-04-15T12:00:00Z',
   '2025-03-01T10:00:00Z', '2025-04-15T12:00:00Z'
 ),
 (
   '00000000-0000-4000-b000-000000000005',
-  'OVHcloud', 'ovhcloud.com', 'https://www.ovhcloud.com', 'https://www.linkedin.com/company/ovhcloud',
-  'Cloud Infrastructure / Hosting', '5001_to_10000', 'Roubaix, France',
-  'private_cloud_provider', 'active', 'high', 'owned', 'strong',
-  'Europe''s largest cloud provider with a uniquely vertically integrated model -- manufactures own servers and water-cooling systems in-house. One of the largest independent hardware buyers globally.',
-  'Post-Strasbourg fire (2021) regulatory scrutiny has slowed some expansion plans.',
-  '[{"category":"server","fit_reason":"Manufactures own servers in Croix factory; buys components directly from OEMs"},{"category":"ssd","fit_reason":"Massive NVMe and SATA SSD volumes for cloud and dedicated server offerings"},{"category":"networking","fit_reason":"Operates private fiber backbone across 40+ data centers; procures switches at scale"},{"category":"memory","fit_reason":"DDR5 server memory at volume for in-house server assembly line"}]'::jsonb,
-  ARRAY['server','ssd','networking','memory','hdd'],
-  'Public company (Euronext Paris). Procurement team based in Roubaix. Strong preference for direct component sourcing.',
+  'Hivelocity', 'hivelocity.net', 'https://www.hivelocity.net', 'https://www.linkedin.com/company/hivelocity',
+  'Bare-Metal Hosting / Cloud Infrastructure', '201_to_500', 'Tampa, FL', 'United States',
+  'datacenter_operator', 'active', 'high', 'owned', 'strong',
+  'US bare-metal and dedicated server provider operating own data centers in Tampa and Atlanta. Procures server hardware, SSDs, and networking equipment directly for fleet buildout.',
+  'Smaller scale than hyperscalers limits procurement volume per cycle.',
+  '[{"category":"server","fit_reason":"Builds and deploys dedicated server fleet; direct buyer of server components"},{"category":"ssd","fit_reason":"NVMe storage for bare-metal offerings; bulk SSD procurement"},{"category":"networking","fit_reason":"Data center networking infrastructure across Tampa and Atlanta facilities"}]'::jsonb,
+  ARRAY['server','ssd','networking','memory'],
+  'Growing GPU dedicated server line. Direct component buyer -- no intermediary distributors.',
   NULL,
   '2025-05-30T16:00:00Z',
   '2024-10-05T09:00:00Z', '2025-05-30T16:00:00Z'
@@ -268,31 +268,31 @@ INSERT INTO contacts (id, account_id, full_name, first_name, last_name, email, e
 (
   '00000000-0000-4000-c000-000000000005',
   '00000000-0000-4000-b000-000000000004',
-  'Klaus Obermeyer', 'Klaus', 'Obermeyer',
-  'k.obermeyer@hetzner.com', 'guess', '{first_initial}.{last}@{domain}',
-  NULL, 'Head of Hardware Procurement',
-  'procurement', 'director', 'procurement',
-  'Component sourcing, vendor negotiations, procurement strategy for in-house server assembly',
-  'Leads all hardware component purchasing for Hetzner''s in-house server manufacturing operation.',
-  'Server Assembly team lead, CFO, Data Center Expansion PM',
+  'David Park', 'David', 'Park',
+  'dpark@penguinsolutions.com', 'likely', '{first_initial}{last}@{domain}',
+  NULL, 'VP of Engineering',
+  'engineering', 'vp', 'hardware_engineering',
+  'HPC cluster design, GPU server integration, component qualification',
+  'Leads engineering team that specifies and qualifies server components for HPC and AI cluster builds. Key decision-maker on GPU and networking hardware selection.',
+  'Procurement Director, Sales Engineering, Government Programs team',
   NULL,
   'primary', 'not_contacted',
-  'Email pattern is a guess based on other Hetzner employees found on LinkedIn. German-speaking; consider DACH team for outreach.',
+  'Previously at Cray/HPE. Deep expertise in GPU cluster architecture.',
   '2025-03-10T11:00:00Z', '2025-03-10T11:00:00Z'
 ),
 (
   '00000000-0000-4000-c000-000000000006',
   '00000000-0000-4000-b000-000000000005',
-  'Camille Durand', 'Camille', 'Durand',
-  'camille.durand@ovhcloud.com', 'verified', '{first}.{last}@{domain}',
-  '+33-3-20-55-0100', 'VP of Industrial Operations',
-  'infrastructure', 'vp', 'datacenter_ops',
-  'Server manufacturing line in Croix, water-cooling R&D, hardware quality assurance',
-  'Oversees OVHcloud''s unique in-house server manufacturing operation. Key decision-maker on component selection and supplier relationships.',
-  'CTO, Head of Procurement, Data Center Construction team',
-  'https://www.linkedin.com/in/camilledurand-ovh',
+  'Rachel Torres', 'Rachel', 'Torres',
+  'rtorres@hivelocity.net', 'likely', '{first_initial}{last}@{domain}',
+  '+1-813-555-0177', 'Director of Infrastructure & Procurement',
+  'procurement', 'director', 'procurement',
+  'Server procurement, vendor negotiations, data center hardware lifecycle',
+  'Owns the hardware procurement pipeline for Hivelocity''s dedicated server fleet. Manages vendor relationships for server, storage, and networking components.',
+  'CTO, Data Center Operations Manager, Finance team',
+  NULL,
   'primary', 'contacted',
-  'Responded positively to initial outreach at CloudFest 2025. Follow up with NVMe SSD pricing.',
+  'Responded to initial outreach at HostingCon 2025. Interested in NVMe SSD volume pricing for upcoming fleet refresh.',
   '2025-01-08T13:00:00Z', '2025-05-20T10:00:00Z'
 );
 
@@ -348,22 +348,22 @@ INSERT INTO evidence (id, account_id, headline, description, raw_excerpt, source
 (
   '00000000-0000-4000-d000-000000000005',
   '00000000-0000-4000-b000-000000000004',
-  'Hetzner opens new data center in Falkenstein with 10,000 server capacity',
-  'Company announcement of a major new data center facility in Falkenstein, Germany. The expansion will require procurement of server components, storage drives, and networking equipment at scale.',
-  'Our new DC7 facility in Falkenstein will house over 10,000 servers, featuring our latest in-house designed server platform with NVMe-only storage...',
-  'https://www.hetzner.com/news/dc7-falkenstein',
-  'company_site', 'positive', 'expansion_signal', 92,
-  ARRAY['server','ssd','networking'],
+  'Penguin Solutions wins DOE contract for next-gen HPC cluster',
+  'Department of Energy awards Penguin Solutions a $45M contract to design and build an HPC cluster for a national laboratory, requiring custom GPU servers with liquid cooling.',
+  'Penguin Solutions will deliver a GPU-accelerated HPC cluster featuring over 500 NVIDIA H100 nodes with direct liquid cooling, targeting 50 petaflops of AI compute capacity...',
+  'https://www.penguinsolutions.com/news/doe-hpc-contract',
+  'press_release', 'positive', 'expansion_signal', 92,
+  ARRAY['server','gpu','networking'],
   '2025-03-20T07:00:00Z', '2025-03-20T07:30:00Z', '2025-03-20T07:30:00Z'
 ),
 (
   '00000000-0000-4000-d000-000000000006',
   '00000000-0000-4000-b000-000000000005',
-  'OVHcloud Q1 2025 earnings: increased CapEx for server manufacturing',
-  'SEC-equivalent filing (AMF) from OVHcloud''s quarterly earnings showing a 35% year-over-year increase in capital expenditure, primarily driven by expanded in-house server manufacturing capacity.',
-  'Capital expenditure for Q1 FY2025 reached EUR 142M, up 35% YoY, driven by investments in our Croix manufacturing facility and new NVMe storage platform rollout...',
-  'https://corporate.ovhcloud.com/en/investors/q1-2025-results',
-  'sec_filing', 'positive', 'budget_signal', 97,
+  'Hivelocity announces Atlanta data center expansion and 2,000-server fleet refresh',
+  'Hivelocity is expanding its Atlanta facility and refreshing its dedicated server fleet with AMD EPYC 9004 processors and NVMe-only storage configurations.',
+  'Our Atlanta expansion will double our current capacity with 2,000 new bare-metal servers featuring AMD EPYC Genoa processors and Gen5 NVMe SSDs...',
+  'https://www.hivelocity.net/blog/atlanta-expansion-2025',
+  'company_site', 'positive', 'expansion_signal', 88,
   ARRAY['server','ssd','memory'],
   '2025-05-05T16:00:00Z', '2025-05-05T16:30:00Z', '2025-05-05T16:30:00Z'
 );
@@ -408,34 +408,34 @@ INSERT INTO news_items (id, title, summary, source_url, source_name, published_a
 ),
 (
   '00000000-0000-4000-e000-000000000003',
-  'OVHcloud Breaks Ground on New Data Center Campus in Strasbourg',
-  'OVHcloud has begun construction on a replacement data center campus in Strasbourg, France, with a planned capacity of 60,000 servers and an estimated EUR 250M investment.',
-  'https://corporate.ovhcloud.com/en/newsroom/strasbourg-campus',
-  'OVHcloud Newsroom',
+  'Hivelocity Expands Atlanta Data Center, Adds GPU Dedicated Servers',
+  'Hivelocity is investing $30M to expand its Atlanta data center with a new wing dedicated to GPU servers and high-density compute, adding 500 bare-metal GPU nodes.',
+  'https://www.hivelocity.net/newsroom/atlanta-gpu-expansion',
+  'Hivelocity Newsroom',
   '2025-05-15T09:00:00Z',
-  'infrastructure_build', 85, 90, 95,
-  '60,000 new servers will require massive component procurement from OVHcloud''s in-house manufacturing line. SSD and memory demand will spike.',
-  'infrastructure',
-  'Offer competitive NVMe SSD and DDR5 memory volume pricing for the new campus buildout timeline.',
-  '[{"category":"server","impact":"60,000 new servers planned"},{"category":"ssd","impact":"NVMe-only storage architecture"},{"category":"memory","impact":"DDR5 ECC at scale for new platform"}]'::jsonb,
-  ARRAY['server','ssd','memory','networking'],
+  'infrastructure_build', 82, 88, 90,
+  'New GPU server line and expanded capacity will drive significant hardware procurement for servers, GPUs, and NVMe storage.',
+  'procurement',
+  'Offer competitive GPU server component pricing and supply guarantees for the Atlanta buildout timeline.',
+  '[{"category":"server","impact":"500 new GPU server nodes planned"},{"category":"gpu","impact":"NVIDIA L40S and H100 GPUs for new dedicated server line"},{"category":"ssd","impact":"NVMe storage for each bare-metal node"}]'::jsonb,
+  ARRAY['server','gpu','ssd','memory'],
   '00000000-0000-4000-b000-000000000005',
   '[]'::jsonb,
   '2025-05-15T10:00:00Z', '2025-05-15T10:00:00Z'
 ),
 (
   '00000000-0000-4000-e000-000000000004',
-  'Hetzner Announces GPU Cloud Offering with NVIDIA L40S',
-  'Hetzner Online is entering the GPU cloud market with new dedicated GPU servers featuring NVIDIA L40S accelerators, marking the company''s first foray into AI/ML infrastructure.',
-  'https://www.hetzner.com/news/gpu-cloud-launch',
-  'Hetzner News',
+  'Penguin Solutions Delivers Largest Commercial AI Training Cluster',
+  'Penguin Solutions has completed deployment of a 1,000-node GPU cluster for a major US financial institution, its largest commercial AI infrastructure project to date.',
+  'https://www.penguinsolutions.com/newsroom/ai-cluster-deployment',
+  'Penguin Solutions Newsroom',
   '2025-04-20T07:00:00Z',
-  'product_launch', 78, 85, 88,
-  'New GPU product line means Hetzner is now procuring GPUs for the first time at scale. Opens new hardware category opportunity.',
+  'expansion', 75, 85, 90,
+  'Validates Penguin Solutions as a large-scale GPU infrastructure buyer. Future cluster deployments will drive continued GPU, server, and networking procurement.',
   'procurement',
-  'Introduce GPU server configurations and supply chain support for their new product line.',
-  '[{"category":"gpu","impact":"New buyer entering GPU market at scale"},{"category":"server","impact":"Custom GPU server chassis required"}]'::jsonb,
-  ARRAY['gpu','server','memory'],
+  'Position component supply agreements for upcoming cluster projects in the sales pipeline.',
+  '[{"category":"gpu","impact":"1,000-node GPU cluster deployed at scale"},{"category":"server","impact":"Custom GPU server chassis procured at volume"}]'::jsonb,
+  ARRAY['gpu','server','networking'],
   '00000000-0000-4000-b000-000000000004',
   '[]'::jsonb,
   '2025-04-20T08:00:00Z', '2025-04-20T08:00:00Z'
@@ -443,12 +443,12 @@ INSERT INTO news_items (id, title, summary, source_url, source_name, published_a
 (
   '00000000-0000-4000-e000-000000000005',
   'Equinix Expands xScale Program with Three New Hyperscale Data Centers',
-  'Equinix announced three new xScale data center facilities in Tokyo, Frankfurt, and Dallas, adding over 100MW of capacity for hyperscale cloud customers.',
+  'Equinix announced three new xScale data center facilities in Dallas, Atlanta, and Portland, adding over 100MW of capacity for hyperscale cloud customers.',
   'https://www.equinix.com/newsroom/xscale-expansion-2025',
   'Equinix Newsroom',
   '2025-05-20T14:00:00Z',
   'expansion', 70, 75, 92,
-  'xScale expansion primarily serves hyperscaler tenants who bring their own hardware. Limited direct procurement impact, but networking infrastructure will be purchased.',
+  'xScale expansion primarily serves hyperscaler tenants who bring their own hardware. Limited direct procurement impact, but networking infrastructure will be purchased for the three new US facilities.',
   'infrastructure',
   'Focus on networking equipment needs for the new xScale facilities.',
   '[{"category":"networking","impact":"New facilities require full networking buildout"}]'::jsonb,

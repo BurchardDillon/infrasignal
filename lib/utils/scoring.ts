@@ -173,6 +173,10 @@ const COMPANY_TYPE_SCORE: Record<CompanyType, number> = {
   bank_financial: 10,
   gov_edu: 8,
   reseller: 6,
+  repair_refurb: 12,
+  msp: 10,
+  itad: 8,
+  colo_bare_metal: 16,
   other: 4,
 };
 

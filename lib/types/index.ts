@@ -6,3 +6,7 @@ export type { Evidence } from "./evidence";
 export type { NewsItem } from "./news";
 export type { Prospect } from "./prospects";
 export type { RawArticleInput, InterpretedNews } from "./ingestion";
+export type * from "./agents";
+export type * from "./feeds";
+export type * from "./discovery";
+export type * from "./pn-lookup";

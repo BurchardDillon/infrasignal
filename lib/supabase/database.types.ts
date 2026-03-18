@@ -17,6 +17,7 @@ export interface Database {
           industry: string | null;
           employee_count_range: string | null;
           hq_location: string | null;
+          country: string;
           priority_score: number;
           signal_summary: string | null;
           proposed_company_type: string | null;
@@ -39,6 +40,7 @@ export interface Database {
           industry?: string | null;
           employee_count_range?: string | null;
           hq_location?: string | null;
+          country?: string;
           priority_score?: number;
           signal_summary?: string | null;
           proposed_company_type?: string | null;
@@ -61,6 +63,7 @@ export interface Database {
           industry?: string | null;
           employee_count_range?: string | null;
           hq_location?: string | null;
+          country?: string;
           priority_score?: number;
           signal_summary?: string | null;
           proposed_company_type?: string | null;
@@ -87,6 +90,7 @@ export interface Database {
           industry: string | null;
           employee_count_range: string | null;
           hq_location: string | null;
+          country: string;
           company_type: string;
           status: string;
           direct_buy_likelihood: string;
@@ -111,6 +115,7 @@ export interface Database {
           industry?: string | null;
           employee_count_range?: string | null;
           hq_location?: string | null;
+          country?: string;
           company_type?: string;
           status?: string;
           direct_buy_likelihood?: string;
@@ -135,6 +140,7 @@ export interface Database {
           industry?: string | null;
           employee_count_range?: string | null;
           hq_location?: string | null;
+          country?: string;
           company_type?: string;
           status?: string;
           direct_buy_likelihood?: string;
@@ -338,6 +344,287 @@ export interface Database {
           linked_accounts?: Json;
           created_at?: string;
           updated_at?: string;
+        };
+      };
+      feed_sources: {
+        Row: {
+          id: string;
+          name: string;
+          url: string;
+          source_type: string;
+          is_enabled: boolean;
+          last_fetched_at: string | null;
+          last_error: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          url: string;
+          source_type?: string;
+          is_enabled?: boolean;
+          last_fetched_at?: string | null;
+          last_error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          url?: string;
+          source_type?: string;
+          is_enabled?: boolean;
+          last_fetched_at?: string | null;
+          last_error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      job_runs: {
+        Row: {
+          id: string;
+          agent_name: string;
+          status: string;
+          started_at: string;
+          completed_at: string | null;
+          duration_ms: number | null;
+          summary: Json;
+          error: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          agent_name: string;
+          status?: string;
+          started_at?: string;
+          completed_at?: string | null;
+          duration_ms?: number | null;
+          summary?: Json;
+          error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          agent_name?: string;
+          status?: string;
+          started_at?: string;
+          completed_at?: string | null;
+          duration_ms?: number | null;
+          summary?: Json;
+          error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      discovery_sources: {
+        Row: {
+          id: string;
+          name: string;
+          source_type: string;
+          source_key: string | null;
+          is_enabled: boolean;
+          record_count: number | null;
+          last_run_at: string | null;
+          last_run_job_id: string | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          source_type: string;
+          source_key?: string | null;
+          is_enabled?: boolean;
+          record_count?: number | null;
+          last_run_at?: string | null;
+          last_run_job_id?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          source_type?: string;
+          source_key?: string | null;
+          is_enabled?: boolean;
+          record_count?: number | null;
+          last_run_at?: string | null;
+          last_run_job_id?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      component_lookups: {
+        Row: {
+          id: string;
+          part_number: string;
+          manufacturer: string | null;
+          description: string | null;
+          category: string | null;
+          subcategory: string | null;
+          socket_platform: string | null;
+          ecosystem: string | null;
+          specs: Json;
+          source: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          part_number: string;
+          manufacturer?: string | null;
+          description?: string | null;
+          category?: string | null;
+          subcategory?: string | null;
+          socket_platform?: string | null;
+          ecosystem?: string | null;
+          specs?: Json;
+          source?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          part_number?: string;
+          manufacturer?: string | null;
+          description?: string | null;
+          category?: string | null;
+          subcategory?: string | null;
+          socket_platform?: string | null;
+          ecosystem?: string | null;
+          specs?: Json;
+          source?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      account_hardware_prefs: {
+        Row: {
+          id: string;
+          account_id: string;
+          buys_cpus: boolean;
+          buys_gpus: boolean;
+          buys_memory: boolean;
+          buys_ssds: boolean;
+          buys_networking: boolean;
+          buys_systems: boolean;
+          buys_frus: boolean;
+          cpu_ecosystem: string[];
+          gpu_ecosystem: string[];
+          platforms: string[];
+          account_type: string | null;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          account_id: string;
+          buys_cpus?: boolean;
+          buys_gpus?: boolean;
+          buys_memory?: boolean;
+          buys_ssds?: boolean;
+          buys_networking?: boolean;
+          buys_systems?: boolean;
+          buys_frus?: boolean;
+          cpu_ecosystem?: string[];
+          gpu_ecosystem?: string[];
+          platforms?: string[];
+          account_type?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          account_id?: string;
+          buys_cpus?: boolean;
+          buys_gpus?: boolean;
+          buys_memory?: boolean;
+          buys_ssds?: boolean;
+          buys_networking?: boolean;
+          buys_systems?: boolean;
+          buys_frus?: boolean;
+          cpu_ecosystem?: string[];
+          gpu_ecosystem?: string[];
+          platforms?: string[];
+          account_type?: string | null;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      deal_history: {
+        Row: {
+          id: string;
+          account_id: string;
+          part_number: string;
+          manufacturer: string | null;
+          description: string | null;
+          quantity: number | null;
+          direction: string;
+          deal_date: string | null;
+          notes: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          account_id: string;
+          part_number: string;
+          manufacturer?: string | null;
+          description?: string | null;
+          quantity?: number | null;
+          direction: string;
+          deal_date?: string | null;
+          notes?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          account_id?: string;
+          part_number?: string;
+          manufacturer?: string | null;
+          description?: string | null;
+          quantity?: number | null;
+          direction?: string;
+          deal_date?: string | null;
+          notes?: string | null;
+          created_at?: string;
+        };
+      };
+      discovery_log: {
+        Row: {
+          id: string;
+          company_name: string;
+          search_type: string | null;
+          state: string | null;
+          discovered_at: string;
+          added_to_accounts: boolean;
+          job_run_id: string | null;
+        };
+        Insert: {
+          id?: string;
+          company_name: string;
+          search_type?: string | null;
+          state?: string | null;
+          discovered_at?: string;
+          added_to_accounts?: boolean;
+          job_run_id?: string | null;
+        };
+        Update: {
+          id?: string;
+          company_name?: string;
+          search_type?: string | null;
+          state?: string | null;
+          discovered_at?: string;
+          added_to_accounts?: boolean;
+          job_run_id?: string | null;
         };
       };
     };

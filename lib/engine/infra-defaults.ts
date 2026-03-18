@@ -19,5 +19,9 @@ export const COMPANY_TYPE_INFRA_DEFAULT: Record<CompanyType, InfraVerdict> = {
   bank_financial: "outsourced",
   gov_edu: "outsourced",
   reseller: "unknown",
+  repair_refurb: "unknown",
+  msp: "leased",
+  itad: "unknown",
+  colo_bare_metal: "leased",
   other: "unknown",
 };

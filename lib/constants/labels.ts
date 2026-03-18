@@ -58,6 +58,10 @@ export const COMPANY_TYPE_LABELS: Record<CompanyType, string> = {
   bank_financial: "Bank / Financial",
   gov_edu: "Gov / Edu",
   reseller: "Reseller",
+  repair_refurb: "Repair / Refurb",
+  msp: "MSP",
+  itad: "ITAD",
+  colo_bare_metal: "Colo / Bare Metal",
   other: "Other",
 };
 

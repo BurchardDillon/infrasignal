@@ -1,6 +1,8 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { ProspectingQueue } from "@/components/prospecting/prospecting-queue";
 
+export const dynamic = "force-dynamic";
+
 export default function ProspectingPage() {
   return (
     <div className="space-y-6">

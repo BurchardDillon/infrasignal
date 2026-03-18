@@ -7,10 +7,22 @@ import { fetchDashboardStats, fetchTopProspects } from "@/lib/supabase/queries";
 import { HARDWARE_CATEGORY_LABELS } from "@/lib/constants/labels";
 
 export async function DashboardStats() {
-  const [stats, topProspects] = await Promise.all([
-    fetchDashboardStats(),
-    fetchTopProspects(3),
-  ]);
+  let stats;
+  let topProspects;
+  try {
+    [stats, topProspects] = await Promise.all([
+      fetchDashboardStats(),
+      fetchTopProspects(3),
+    ]);
+  } catch (error) {
+    console.error("[DashboardStats] Supabase fetch failed:", error);
+    return (
+      <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+        Failed to load dashboard data. Check server logs for details.
+        <pre className="mt-2 text-xs">{String(error)}</pre>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

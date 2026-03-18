@@ -25,6 +25,10 @@ export type CompanyType =
   | "bank_financial"
   | "gov_edu"
   | "reseller"
+  | "repair_refurb"
+  | "msp"
+  | "itad"
+  | "colo_bare_metal"
   | "other";
 
 export type InfraVerdict =

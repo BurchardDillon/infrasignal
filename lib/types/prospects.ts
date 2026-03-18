@@ -15,6 +15,7 @@ export interface Prospect {
   industry: string | null;
   employee_count_range: EmployeeCountRange | null;
   hq_location: string | null;
+  country: string;
   priority_score: number;
   signal_summary: string | null;
   proposed_company_type: CompanyType | null;

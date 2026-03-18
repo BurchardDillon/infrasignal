@@ -4,7 +4,7 @@ import { matchAccountsForComponent } from "@/lib/engine/pn-matcher";
 import { investigateAccounts } from "@/lib/engine/pn-web-intel";
 import type { PnLookupResponse, PnLookupResponseWithWebIntel } from "@/lib/types/pn-lookup";
 
-export const maxDuration = 300;
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
   try {

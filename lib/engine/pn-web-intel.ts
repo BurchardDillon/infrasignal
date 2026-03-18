@@ -49,7 +49,9 @@ export async function investigateAccounts(
   matches: PnMatchResult[],
   onProgress?: ProgressCallback
 ): Promise<{ updatedMatches: PnMatchResult[]; intel: WebIntelResult }> {
-  const total = matches.length;
+  // Only research the top 25 matches; the rest are returned as-is
+  const toResearch = matches.slice(0, 25);
+  const total = toResearch.length;
   let completed = 0;
   let accountsUpdated = 0;
 
@@ -65,8 +67,8 @@ export async function investigateAccounts(
   const BATCH_SIZE = 10;
   const results: PromiseSettledResult<PnMatchResult>[] = [];
 
-  for (let i = 0; i < matches.length; i += BATCH_SIZE) {
-    const batch = matches.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < toResearch.length; i += BATCH_SIZE) {
+    const batch = toResearch.slice(i, i + BATCH_SIZE);
     const batchResults = await Promise.allSettled(
       batch.map(async (match) => {
         try {
@@ -136,13 +138,16 @@ export async function investigateAccounts(
     results.push(...batchResults);
   }
 
-  // Collect results, keeping fulfilled values or original match on rejection
-  const updatedMatches = results.map((r, i) =>
-    r.status === "fulfilled" ? r.value : matches[i]
+  // Collect researched results, keeping fulfilled values or original on rejection
+  const researchedResults = results.map((r, i) =>
+    r.status === "fulfilled" ? r.value : toResearch[i]
   );
 
-  // Re-sort by updated match score
-  updatedMatches.sort((a, b) => b.match_score - a.match_score);
+  // Combine researched top-25 with remaining unresearched accounts, sorted
+  const updatedMatches = [
+    ...researchedResults,
+    ...matches.slice(25),
+  ].sort((a, b) => b.match_score - a.match_score);
 
   return {
     updatedMatches,

@@ -85,7 +85,7 @@ export interface DealHistoryEntry {
 }
 
 // SSE event types for streaming investigation progress
-export interface ProgressEvent {
+export interface InvestigationProgressEvent {
   type: "progress";
   account: string;
   status: "done" | "error";
@@ -94,7 +94,7 @@ export interface ProgressEvent {
   completed: number;
 }
 
-export interface CompleteEvent {
+export interface InvestigationCompleteEvent {
   type: "complete";
   result: PnLookupResponseWithWebIntel;
 }

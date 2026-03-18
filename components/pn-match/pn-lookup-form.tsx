@@ -8,8 +8,8 @@ import { ScoreBar } from "@/components/ui/score-bar";
 import type {
   PnLookupResponseWithWebIntel,
   PnMatchResult,
-  ProgressEvent,
-  CompleteEvent,
+  InvestigationProgressEvent,
+  InvestigationCompleteEvent,
 } from "@/lib/types/pn-lookup";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -67,7 +67,7 @@ export function PnLookupForm() {
           for (const line of lines) {
             if (!line.trim()) continue;
             try {
-              const event = JSON.parse(line) as ProgressEvent | CompleteEvent;
+              const event = JSON.parse(line) as InvestigationProgressEvent | InvestigationCompleteEvent;
               if (event.type === "progress") {
                 setProgressTotal(event.total);
                 setProgressCompleted(event.completed);
@@ -84,7 +84,7 @@ export function PnLookupForm() {
         // Process any remaining buffer
         if (buffer.trim()) {
           try {
-            const event = JSON.parse(buffer) as ProgressEvent | CompleteEvent;
+            const event = JSON.parse(buffer) as InvestigationProgressEvent | InvestigationCompleteEvent;
             if (event.type === "complete") {
               setResult(event.result);
             }
